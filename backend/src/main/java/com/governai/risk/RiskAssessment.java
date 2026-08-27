@@ -2,6 +2,8 @@ package com.governai.risk;
 
 import com.governai.aisystem.AIApplication;
 import jakarta.persistence.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 
 @Entity
@@ -14,15 +16,33 @@ public class RiskAssessment {
     @Column(name = "fairness_score", nullable = false) private int fairnessScore;
     @Column(name = "transparency_score", nullable = false) private int transparencyScore;
     @Column(name = "regulatory_score", nullable = false) private int regulatoryScore;
-    @Column(name = "overall_score", nullable = false) private double overallScore;
+    @Column(name = "overall_score", nullable = false, precision = 5, scale = 2) private BigDecimal overallScore;
     @Enumerated(EnumType.STRING) @Column(name = "risk_level", nullable = false) private AssessmentRiskLevel riskLevel;
     @Column(nullable = false) private Instant createdAt;
+
     protected RiskAssessment() {}
+
     public RiskAssessment(AIApplication app, int privacy, int security, int fairness, int transparency, int regulatory) {
-        this.aiApplication=app; this.privacyScore=privacy; this.securityScore=security; this.fairnessScore=fairness; this.transparencyScore=transparency; this.regulatoryScore=regulatory;
-        this.overallScore=(privacy+security+fairness+transparency+regulatory)/5.0; this.riskLevel=AssessmentRiskLevel.fromScore(this.overallScore); this.createdAt=Instant.now();
+        this.aiApplication = app;
+        this.privacyScore = privacy;
+        this.securityScore = security;
+        this.fairnessScore = fairness;
+        this.transparencyScore = transparency;
+        this.regulatoryScore = regulatory;
+        this.overallScore = BigDecimal.valueOf(privacy + security + fairness + transparency + regulatory)
+                .divide(BigDecimal.valueOf(5), 2, RoundingMode.HALF_UP);
+        this.riskLevel = AssessmentRiskLevel.fromScore(this.overallScore.doubleValue());
+        this.createdAt = Instant.now();
     }
-    public Long getId(){return id;} public AIApplication getAiApplication(){return aiApplication;} public int getPrivacyScore(){return privacyScore;} public int getSecurityScore(){return securityScore;}
-    public int getFairnessScore(){return fairnessScore;} public int getTransparencyScore(){return transparencyScore;} public int getRegulatoryScore(){return regulatoryScore;}
-    public double getOverallScore(){return overallScore;} public AssessmentRiskLevel getRiskLevel(){return riskLevel;} public Instant getCreatedAt(){return createdAt;}
+
+    public Long getId(){return id;}
+    public AIApplication getAiApplication(){return aiApplication;}
+    public int getPrivacyScore(){return privacyScore;}
+    public int getSecurityScore(){return securityScore;}
+    public int getFairnessScore(){return fairnessScore;}
+    public int getTransparencyScore(){return transparencyScore;}
+    public int getRegulatoryScore(){return regulatoryScore;}
+    public BigDecimal getOverallScore(){return overallScore;}
+    public AssessmentRiskLevel getRiskLevel(){return riskLevel;}
+    public Instant getCreatedAt(){return createdAt;}
 }
