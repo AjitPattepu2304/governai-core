@@ -2,10 +2,12 @@ package com.governai.aisystem;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/ai-systems")
@@ -25,7 +27,7 @@ public class AIApplicationController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public AIApplication create(@Valid @RequestBody CreateAIApplicationRequest request) {
-        return repository.save(new AIApplication(request.name(), request.purpose(), request.owner(), request.businessUnit(), request.riskLevel()));
+        return repository.save(new AIApplication(request.name(), request.purpose(), request.owner(), request.businessUnit(), request.riskLevel(), request.countries()));
     }
 
     public record CreateAIApplicationRequest(
@@ -33,7 +35,8 @@ public class AIApplicationController {
         @NotBlank String purpose,
         @NotBlank String owner,
         @NotBlank String businessUnit,
-        @NotNull RiskLevel riskLevel) {}
+        @NotNull RiskLevel riskLevel,
+        @NotEmpty Set<CountryCode> countries) {}
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     static class AIApplicationNotFoundException extends RuntimeException {
