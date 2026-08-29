@@ -12,7 +12,16 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5176"}, allowCredentials = "true")
+@CrossOrigin(
+        origins = {
+                "http://localhost:5173",
+                "http://localhost:5174",
+                "http://localhost:5175",
+                "http://localhost:5176"
+        },
+        allowCredentials = "true"
+)
+
 public class AuthController {
     private static final String USER_ID = "GOVERN_AI_USER_ID";
     private final AppUserRepository users;
