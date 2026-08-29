@@ -11,7 +11,6 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/ai-systems")
-@CrossOrigin(origins = "*")
 public class AIApplicationController {
     private final AIApplicationRepository repository;
     public AIApplicationController(AIApplicationRepository repository) { this.repository = repository; }
