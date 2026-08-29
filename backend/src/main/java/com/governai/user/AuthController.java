@@ -53,8 +53,14 @@ public class AuthController {
     @GetMapping("/me")
     public AuthResponse me(HttpSession session) {
         Object id = session.getAttribute(USER_ID);
-        if (id == null) throw new UnauthorizedException();
-        return users.findById((Long) id).map(this::response).orElseThrow(UnauthorizedException::new);
+
+        if (id == null) {
+            throw new UnauthorizedException();
+        }
+
+        return users.findByIdWithOrganization((Long) id)
+                .map(this::response)
+                .orElseThrow(UnauthorizedException::new);
     }
 
     @PostMapping("/logout")
