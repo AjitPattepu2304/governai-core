@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
         },
         allowCredentials = "true"
 )
+
 public class AuthController {
     private static final String USER_ID = "GOVERN_AI_USER_ID";
     private final AppUserRepository users;

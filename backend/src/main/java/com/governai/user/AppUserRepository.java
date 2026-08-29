@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface AppUserRepository extends JpaRepository<AppUser, Long> {
-
     @Query("""
         SELECT u
         FROM AppUser u
