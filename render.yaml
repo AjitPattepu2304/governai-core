@@ -8,6 +8,7 @@ services:
   - type: web
     name: governai-backend
     runtime: docker
+    plan: free
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
     envVars:
