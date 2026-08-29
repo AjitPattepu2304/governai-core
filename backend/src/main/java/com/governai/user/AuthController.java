@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
         },
         allowCredentials = "true"
 )
-
 public class AuthController {
     private static final String USER_ID = "GOVERN_AI_USER_ID";
     private final AppUserRepository users;
@@ -44,8 +43,13 @@ public class AuthController {
 
     @PostMapping("/login")
     public AuthResponse login(@Valid @RequestBody LoginRequest request, HttpSession session) {
-        AppUser user = users.findByEmailIgnoreCase(request.email()).orElseThrow(() -> new IllegalArgumentException("Invalid email or password."));
-        if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) throw new IllegalArgumentException("Invalid email or password.");
+        AppUser user = users.findByEmailIgnoreCase(request.email().trim())
+                .orElseThrow(UnauthorizedException::new);
+
+        if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+            throw new UnauthorizedException();
+        }
+
         session.setAttribute(USER_ID, user.getId());
         return response(user);
     }
