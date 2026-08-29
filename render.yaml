@@ -11,10 +11,18 @@ services:
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
     envVars:
-      - key: DATABASE_URL
+      - key: DATABASE_HOST
         fromDatabase:
           name: governai-db
-          property: connectionString
+          property: host
+      - key: DATABASE_PORT
+        fromDatabase:
+          name: governai-db
+          property: port
+      - key: DATABASE_NAME
+        fromDatabase:
+          name: governai-db
+          property: database
       - key: DATABASE_USERNAME
         fromDatabase:
           name: governai-db
