@@ -8,21 +8,14 @@ services:
   - type: web
     name: governai-backend
     runtime: docker
+    plan: free
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
     envVars:
-      - key: DATABASE_HOST
+      - key: DATABASE_URL
         fromDatabase:
           name: governai-db
-          property: host
-      - key: DATABASE_PORT
-        fromDatabase:
-          name: governai-db
-          property: port
-      - key: DATABASE_NAME
-        fromDatabase:
-          name: governai-db
-          property: database
+          property: connectionString
       - key: DATABASE_USERNAME
         fromDatabase:
           name: governai-db
