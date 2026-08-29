@@ -3,8 +3,6 @@ package com.governai.risk;
 import com.governai.aisystem.AIApplication;
 import com.governai.aisystem.AIApplicationRepository;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +14,10 @@ import java.util.List;
 public class RiskAssessmentController {
     private final RiskAssessmentRepository assessments;
     private final AIApplicationRepository applications;
+    private final RiskEvaluationService evaluationService;
 
-    public RiskAssessmentController(RiskAssessmentRepository assessments, AIApplicationRepository applications) {
-        this.assessments = assessments; this.applications = applications;
+    public RiskAssessmentController(RiskAssessmentRepository assessments, AIApplicationRepository applications, RiskEvaluationService evaluationService) {
+        this.assessments = assessments; this.applications = applications; this.evaluationService = evaluationService;
     }
 
     @GetMapping("/ai-system/{aiSystemId}")
@@ -28,11 +27,9 @@ public class RiskAssessmentController {
     @ResponseStatus(HttpStatus.CREATED)
     public RiskAssessment create(@Valid @RequestBody CreateRiskAssessmentRequest request) {
         AIApplication app = applications.findById(request.aiSystemId()).orElseThrow(() -> new IllegalArgumentException("AI system not found: " + request.aiSystemId()));
-        return assessments.save(new RiskAssessment(app, request.privacyScore(), request.securityScore(), request.fairnessScore(), request.transparencyScore(), request.regulatoryScore()));
+        RiskEvaluationService.Evaluation e = evaluationService.evaluate(app);
+        return assessments.save(new RiskAssessment(app, e.privacy(), e.security(), e.fairness(), e.transparency(), e.regulatory(), "v1", e.explanation()));
     }
 
-    public record CreateRiskAssessmentRequest(@NotNull Long aiSystemId,
-        @Min(0) @Max(100) int privacyScore, @Min(0) @Max(100) int securityScore,
-        @Min(0) @Max(100) int fairnessScore, @Min(0) @Max(100) int transparencyScore,
-        @Min(0) @Max(100) int regulatoryScore) {}
+    public record CreateRiskAssessmentRequest(@NotNull Long aiSystemId) {}
 }
