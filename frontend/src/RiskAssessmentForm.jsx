@@ -30,6 +30,11 @@ function riskTone(score) {
   return 'low';
 }
 
+function riskLevelTone(level) {
+  const normalized = String(level || '').toLowerCase();
+  return normalized === 'critical' ? 'high' : normalized || 'medium';
+}
+
 function contextValue(system, key) {
   if (key === 'countries') return (system.countries || []).join(', ') || '—';
   if (['personalData', 'sensitiveData', 'externalAiProvider'].includes(key)) return yesNo(system[key]);
@@ -56,7 +61,7 @@ export default function RiskAssessmentForm({ system, onSaved, onCancel }) {
   };
 
   const overall = Number(result?.overallScore ?? 0);
-  const overallTone = result ? riskTone(overall) : 'low';
+  const overallTone = result ? riskLevelTone(result.riskLevel) : 'medium';
 
   return (
     <section className="risk-assessment panel form-panel">
