@@ -19,10 +19,13 @@ public class RiskAssessment {
     @Column(name = "overall_score", nullable = false, precision = 5, scale = 2) private BigDecimal overallScore;
     @Enumerated(EnumType.STRING) @Column(name = "risk_level", nullable = false) private AssessmentRiskLevel riskLevel;
     @Column(nullable = false) private Instant createdAt;
+    @Column(name = "methodology_version", nullable = false, length = 20) private String methodologyVersion;
+    @Column(nullable = false, columnDefinition = "TEXT") private String explanation;
 
     protected RiskAssessment() {}
 
-    public RiskAssessment(AIApplication app, int privacy, int security, int fairness, int transparency, int regulatory) {
+    public RiskAssessment(AIApplication app, int privacy, int security, int fairness, int transparency, int regulatory,
+                          String methodologyVersion, String explanation) {
         this.aiApplication = app;
         this.privacyScore = privacy;
         this.securityScore = security;
@@ -33,16 +36,14 @@ public class RiskAssessment {
                 .divide(BigDecimal.valueOf(5), 2, RoundingMode.HALF_UP);
         this.riskLevel = AssessmentRiskLevel.fromScore(this.overallScore.doubleValue());
         this.createdAt = Instant.now();
+        this.methodologyVersion = methodologyVersion;
+        this.explanation = explanation;
     }
 
-    public Long getId(){return id;}
-    public AIApplication getAiApplication(){return aiApplication;}
-    public int getPrivacyScore(){return privacyScore;}
-    public int getSecurityScore(){return securityScore;}
-    public int getFairnessScore(){return fairnessScore;}
-    public int getTransparencyScore(){return transparencyScore;}
-    public int getRegulatoryScore(){return regulatoryScore;}
-    public BigDecimal getOverallScore(){return overallScore;}
-    public AssessmentRiskLevel getRiskLevel(){return riskLevel;}
-    public Instant getCreatedAt(){return createdAt;}
+    public Long getId(){return id;} public AIApplication getAiApplication(){return aiApplication;}
+    public int getPrivacyScore(){return privacyScore;} public int getSecurityScore(){return securityScore;}
+    public int getFairnessScore(){return fairnessScore;} public int getTransparencyScore(){return transparencyScore;}
+    public int getRegulatoryScore(){return regulatoryScore;} public BigDecimal getOverallScore(){return overallScore;}
+    public AssessmentRiskLevel getRiskLevel(){return riskLevel;} public Instant getCreatedAt(){return createdAt;}
+    public String getMethodologyVersion(){return methodologyVersion;} public String getExplanation(){return explanation;}
 }
