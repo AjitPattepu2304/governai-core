@@ -1,26 +1,49 @@
 import { useState } from 'react';
 import { riskApi } from './riskApi';
 
-const dimensions = [
-  ['privacyScore', 'Privacy Risk'], ['securityScore', 'Security Risk'], ['fairnessScore', 'Fairness / Bias Risk'],
-  ['transparencyScore', 'Transparency Risk'], ['regulatoryScore', 'Regulatory Risk']
-];
-
 export default function RiskAssessmentForm({ system, onSaved, onCancel }) {
-  const [scores, setScores] = useState(Object.fromEntries(dimensions.map(([key]) => [key, 50])));
+  const [result, setResult] = useState(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  const overall = Object.values(scores).reduce((a, b) => a + Number(b), 0) / dimensions.length;
 
-  const submit = async (e) => {
+  const evaluate = async (e) => {
     e.preventDefault(); setSaving(true); setError('');
-    try { await riskApi.create({ aiSystemId: system.id, ...Object.fromEntries(Object.entries(scores).map(([k,v]) => [k, Number(v)])) }); onSaved(); }
-    catch (err) { setError(err.message || 'Unable to save assessment.'); } finally { setSaving(false); }
+    try {
+      const assessment = await riskApi.create({ aiSystemId: system.id });
+      setResult(assessment);
+    } catch (err) { setError(err.message || 'Unable to evaluate AI system.'); }
+    finally { setSaving(false); }
   };
 
-  return <section className="panel form-panel"><div className="panel-header"><div><h3>Risk Assessment</h3><p>{system.name} · Score each dimension from 0 to 100.</p></div></div>
-    <form onSubmit={submit}><div className="risk-preview"><span>Current overall score</span><strong>{overall.toFixed(0)} / 100</strong></div>
-      {dimensions.map(([key, label]) => <label key={key} className="score-field"><span>{label}<strong>{scores[key]}</strong></span><input type="range" min="0" max="100" value={scores[key]} onChange={e => setScores({...scores, [key]: e.target.value})}/><div className="range-labels"><span>Low risk</span><span>High risk</span></div></label>)}
-      {error && <div className="error">{error}</div>}<div className="form-actions"><button type="button" className="secondary" onClick={onCancel}>Cancel</button><button className="primary" disabled={saving}>{saving ? 'Saving...' : 'Save Assessment'}</button></div>
-    </form></section>;
+  const label = value => value ? value.replaceAll('_', ' ') : '—';
+
+  return <section className="panel form-panel">
+    <div className="panel-header"><div><h3>AI Risk Evaluation</h3><p>{system.name} · GovernAI Risk Engine v1</p></div></div>
+    <div className="context-summary">
+      <h4>Evaluation context</h4>
+      <div className="context-grid">
+        <span><b>AI Type</b>{label(system.aiType)}</span>
+        <span><b>Lifecycle</b>{label(system.lifecycle)}</span>
+        <span><b>Decision Impact</b>{label(system.decisionImpact)}</span>
+        <span><b>Human Oversight</b>{label(system.humanOversight)}</span>
+        <span><b>Countries</b>{(system.countries || []).join(', ') || '—'}</span>
+        <span><b>Personal Data</b>{system.personalData ? 'Yes' : 'No'}</span>
+        <span><b>Sensitive Data</b>{system.sensitiveData ? 'Yes' : 'No'}</span>
+        <span><b>External Provider</b>{system.externalAiProvider ? 'Yes' : 'No'}</span>
+      </div>
+    </div>
+    {!result && <form onSubmit={evaluate}>
+      <div className="info-box"><strong>No manual scores required.</strong><p>GovernAI calculates the assessment from the registered AI system context. The result is deterministic and includes an explanation and methodology version.</p></div>
+      {error && <div className="error">{error}</div>}
+      <div className="form-actions"><button type="button" className="secondary" onClick={onCancel}>Cancel</button><button className="primary" disabled={saving}>{saving ? 'Evaluating...' : 'Run Risk Evaluation'}</button></div>
+    </form>}
+    {result && <div className="evaluation-result">
+      <div className="risk-preview"><span>Overall Risk Score</span><strong>{result.overallScore} / 100</strong><b>{result.riskLevel}</b></div>
+      <div className="score-grid">
+        {[[result.privacyScore,'Privacy'],[result.securityScore,'Security'],[result.fairnessScore,'Fairness / Bias'],[result.transparencyScore,'Transparency'],[result.regulatoryScore,'Regulatory']].map(([score,name]) => <div className="score-card" key={name}><span>{name}</span><strong>{score}</strong><small>/ 100</small></div>)}
+      </div>
+      <div className="info-box"><strong>Why this result?</strong><p>{result.explanation}</p><small>Methodology: {result.methodologyVersion}</small></div>
+      <div className="form-actions"><button className="primary" onClick={onSaved}>Done</button></div>
+    </div>}
+  </section>;
 }
