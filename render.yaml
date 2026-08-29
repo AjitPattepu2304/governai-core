@@ -1,0 +1,49 @@
+databases:
+  - name: governai-db
+    databaseName: governai
+    user: governai
+    plan: free
+
+services:
+  - type: web
+    name: governai-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    envVars:
+      - key: DATABASE_HOST
+        fromDatabase:
+          name: governai-db
+          property: host
+      - key: DATABASE_PORT
+        fromDatabase:
+          name: governai-db
+          property: port
+      - key: DATABASE_NAME
+        fromDatabase:
+          name: governai-db
+          property: database
+      - key: DATABASE_USERNAME
+        fromDatabase:
+          name: governai-db
+          property: user
+      - key: DATABASE_PASSWORD
+        fromDatabase:
+          name: governai-db
+          property: password
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://governai-frontend.onrender.com
+
+  - type: web
+    name: governai-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://governai-backend.onrender.com/api/v1
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
