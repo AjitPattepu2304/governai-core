@@ -1,0 +1,17 @@
+# IntelliJ
+.idea/
+*.iml
+
+# Maven
+backend/target/
+
+# OS
+.DS_Store
+
+# Node
+frontend/node_modules/
+
+# Environment
+.env
+.env.*
+!.env.example
