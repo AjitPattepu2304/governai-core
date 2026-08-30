@@ -7,5 +7,6 @@ import java.util.Optional;
 
 public interface AIApplicationRepository extends JpaRepository<AIApplication, Long> {
     List<AIApplication> findAllByOrganizationId(Long organizationId);
+
     Optional<AIApplication> findByIdAndOrganizationId(Long id, Long organizationId);
 }
