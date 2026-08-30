@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -49,5 +50,6 @@ public class RiskAssessmentController {
         return assessments.save(new RiskAssessment(app, e.privacy(), e.security(), e.fairness(), e.transparency(), e.regulatory(), "v1", e.explanation()));
     }
 
-    public record CreateRiskAssessmentRequest(@NotNull Long aiSystemId) {}
+    public record CreateRiskAssessmentRequest(@NotNull Long aiSystemId) {
+    }
 }

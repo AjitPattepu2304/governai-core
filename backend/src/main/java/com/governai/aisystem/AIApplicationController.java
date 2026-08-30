@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.Set;
 
@@ -36,7 +37,8 @@ public class AIApplicationController {
                 .orElseThrow(() -> new AIApplicationNotFoundException(id));
     }
 
-    @PostMapping @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public AIApplication create(@Valid @RequestBody CreateAIApplicationRequest request, HttpSession session) {
         AppUser user = currentUser.requireUser(session);
         return repository.save(new AIApplication(request.name(), request.purpose(), request.owner(), request.businessUnit(),
@@ -46,13 +48,17 @@ public class AIApplicationController {
     }
 
     public record CreateAIApplicationRequest(
-        @NotBlank String name, @NotBlank String purpose, @NotBlank String owner, @NotBlank String businessUnit,
-        @NotNull RiskLevel riskLevel, @NotEmpty Set<CountryCode> countries, @NotNull AIType aiType,
-        @NotNull Lifecycle lifecycle, @NotNull DecisionImpact decisionImpact, @NotNull HumanOversight humanOversight,
-        boolean personalData, boolean sensitiveData, boolean externalAiProvider) {}
+            @NotBlank String name, @NotBlank String purpose, @NotBlank String owner, @NotBlank String businessUnit,
+            @NotNull RiskLevel riskLevel, @NotEmpty Set<CountryCode> countries, @NotNull AIType aiType,
+            @NotNull Lifecycle lifecycle, @NotNull DecisionImpact decisionImpact,
+            @NotNull HumanOversight humanOversight,
+            boolean personalData, boolean sensitiveData, boolean externalAiProvider) {
+    }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     static class AIApplicationNotFoundException extends RuntimeException {
-        AIApplicationNotFoundException(Long id) { super("AI system not found: " + id); }
+        AIApplicationNotFoundException(Long id) {
+            super("AI system not found: " + id);
+        }
     }
 }

@@ -165,5 +165,6 @@ public class RiskEvaluationService {
             int overall,
             AssessmentRiskLevel riskLevel,
             String explanation
-    ) {}
+    ) {
+    }
 }

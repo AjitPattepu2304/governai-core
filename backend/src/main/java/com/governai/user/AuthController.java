@@ -19,13 +19,16 @@ public class AuthController {
     private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
     public AuthController(AppUserRepository users, OrganizationRepository organizations, org.springframework.security.crypto.password.PasswordEncoder passwordEncoder) {
-        this.users = users; this.organizations = organizations; this.passwordEncoder = passwordEncoder;
+        this.users = users;
+        this.organizations = organizations;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public AuthResponse register(@Valid @RequestBody RegisterRequest request, HttpSession session) {
-        if (users.existsByEmailIgnoreCase(request.email())) throw new IllegalArgumentException("An account already exists for this email.");
+        if (users.existsByEmailIgnoreCase(request.email()))
+            throw new IllegalArgumentException("An account already exists for this email.");
         Organization organization = organizations.save(new Organization(request.organizationName(), request.countryCode()));
         AppUser user = users.save(new AppUser(request.name(), request.email().trim().toLowerCase(), passwordEncoder.encode(request.password()), organization, UserRole.ADMIN));
         session.setAttribute(USER_ID, user.getId());
@@ -60,12 +63,27 @@ public class AuthController {
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void logout(HttpSession session) { session.invalidate(); }
+    public void logout(HttpSession session) {
+        session.invalidate();
+    }
 
-    private AuthResponse response(AppUser user) { return new AuthResponse(user.getId(), user.getName(), user.getEmail(), user.getRole().name(), user.getOrganization().getId(), user.getOrganization().getName()); }
+    private AuthResponse response(AppUser user) {
+        return new AuthResponse(user.getId(), user.getName(), user.getEmail(), user.getRole().name(), user.getOrganization().getId(), user.getOrganization().getName());
+    }
 
-    public record RegisterRequest(@NotBlank String name, @Email @NotBlank String email, @Size(min=8, max=100) String password, @NotBlank String organizationName, @NotBlank String countryCode) {}
-    public record LoginRequest(@Email @NotBlank String email, @NotBlank String password) {}
-    public record AuthResponse(Long id, String name, String email, String role, Long organizationId, String organizationName) {}
-    @ResponseStatus(HttpStatus.UNAUTHORIZED) static class UnauthorizedException extends RuntimeException {}
+    public record RegisterRequest(@NotBlank String name, @Email @NotBlank String email,
+                                  @Size(min = 8, max = 100) String password, @NotBlank String organizationName,
+                                  @NotBlank String countryCode) {
+    }
+
+    public record LoginRequest(@Email @NotBlank String email, @NotBlank String password) {
+    }
+
+    public record AuthResponse(Long id, String name, String email, String role, Long organizationId,
+                               String organizationName) {
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    static class UnauthorizedException extends RuntimeException {
+    }
 }
