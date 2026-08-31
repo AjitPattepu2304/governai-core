@@ -1,10 +1,6 @@
 spring:
   application:
     name: governai-backend
-  datasource:
-    url: jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${DATABASE_NAME:governai}
-    username: ${DATABASE_USERNAME:postgres}
-    password: ${DATABASE_PASSWORD:postgres}
   jpa:
     hibernate:
       ddl-auto: validate
