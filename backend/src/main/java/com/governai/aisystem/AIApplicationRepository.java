@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AIApplicationRepository extends JpaRepository<AIApplication, Long> {
-    @EntityGraph(attributePaths = "organization")
+    @EntityGraph(attributePaths = {"organization", "countries"})
     List<AIApplication> findAllByOrganizationId(Long organizationId);
 
-    @EntityGraph(attributePaths = "organization")
+    @EntityGraph(attributePaths = {"organization", "countries"})
     Optional<AIApplication> findByIdAndOrganizationId(Long id, Long organizationId);
 }
